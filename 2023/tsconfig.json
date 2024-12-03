@@ -1,0 +1,13 @@
+{
+  "compilerOptions": {
+    "outDir": "dist",
+    "target": "ES2020",
+    "module": "NodeNext",
+    "noImplicitAny": true, 
+    "lib": [
+      "ES2021.String"
+    ]
+  },
+  "include": ["src"], 
+  "exclude": ["node_modules"]
+}
