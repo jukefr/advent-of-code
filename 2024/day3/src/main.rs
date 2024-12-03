@@ -27,7 +27,7 @@ fn part_2(input: &str) -> i32 {
         match &cap[0] {
             "do()" => is_enabled = true,
             "don't()" => is_enabled = false,
-            mul if is_enabled => {
+            _mul if is_enabled => {
                 let x: i32 = cap[1].parse().unwrap();
                 let y: i32 = cap[2].parse().unwrap();
                 sum += x * y;
