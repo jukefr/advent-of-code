@@ -86,30 +86,18 @@ fn part_2(grid: &Vec<Vec<char>>) -> usize {
     count
 }
 
-fn read_grid_from_file(file_path: &str) -> io::Result<Vec<Vec<char>>> {
-    let mut grid = Vec::new();
-    let file = File::open(file_path)?;
-    let reader = io::BufReader::new(file);
-    for line in reader.lines() {
-        let line = line?;
-        grid.push(line.chars().collect());
-    }
-    Ok(grid)
-}
-
 fn main() {
     let file_path = "input";
-    match read_grid_from_file(file_path) {
-        Ok(grid) => {
-            let count_part_1 = part_1(&grid);
-            println!("[Part 1] {}", count_part_1);
-            let count_part_2 = part_2(&grid);
-            println!("[Part 2] {}", count_part_2);
-        }
-        Err(e) => {
-            eprintln!("Error reading file: {}", e);
-        }
-    }
+    let file = File::open(file_path).expect("Failed to read input file");
+    let reader = io::BufReader::new(file);
+    let grid: Vec<Vec<char>> = reader
+        .lines()
+        .map(|line| line.unwrap().chars().collect())
+        .collect();
+    let count_part_1 = part_1(&grid);
+    println!("[Part 1] {}", count_part_1);
+    let count_part_2 = part_2(&grid);
+    println!("[Part 2] {}", count_part_2);
 }
 
 #[cfg(test)]
@@ -117,6 +105,7 @@ mod tests {
     use super::*;
     fn parse_grid(input: &str) -> Vec<Vec<char>> {
         input
+            .trim()
             .lines()
             .map(|line| line.trim().chars().collect())
             .collect()
