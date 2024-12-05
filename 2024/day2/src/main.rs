@@ -66,34 +66,37 @@ fn main() {
 #[cfg(test)]
 mod tests {
     use super::*;
+    fn parse_input(input: &str) -> String {
+        input.trim().to_string()
+    }
     #[test]
     fn test_part_1() {
-        let levels = vec![7, 6, 4, 2, 1];
-        assert!(part_1(&levels));
-        let levels = vec![1, 2, 7, 8, 9];
-        assert!(!part_1(&levels));
-        let levels = vec![9, 7, 6, 2, 1];
-        assert!(!part_1(&levels));
-        let levels = vec![1, 3, 2, 4, 5];
-        assert!(!part_1(&levels));
-        let levels = vec![8, 6, 4, 4, 1];
-        assert!(!part_1(&levels));
-        let levels = vec![1, 3, 6, 7, 9];
-        assert!(part_1(&levels));
+        let input = "\
+            7 6 4 2 1
+            1 2 7 8 9
+            9 7 6 2 1
+            1 3 2 4 5
+            8 6 4 4 1
+            1 3 6 7 9
+        ";
+        let parsed_input = parse_input(input);
+        let total_score = analyze(&parsed_input, 1);
+        let expected_score = 2;
+        assert_eq!(total_score, expected_score);
     }
     #[test]
     fn test_part_2() {
-        let levels = vec![7, 6, 4, 2, 1];
-        assert!(part_2(&levels));
-        let levels = vec![1, 2, 7, 8, 9];
-        assert!(!part_2(&levels));
-        let levels = vec![9, 7, 6, 2, 1];
-        assert!(!part_2(&levels));
-        let levels = vec![1, 3, 2, 4, 5];
-        assert!(part_2(&levels));
-        let levels = vec![8, 6, 4, 4, 1];
-        assert!(part_2(&levels));
-        let levels = vec![1, 3, 6, 7, 9];
-        assert!(part_2(&levels));
+        let input = "\
+            7 6 4 2 1
+            1 2 7 8 9
+            9 7 6 2 1
+            1 3 2 4 5
+            8 6 4 4 1
+            1 3 6 7 9
+        ";
+        let parsed_input = parse_input(input);
+        let total_score = analyze(&parsed_input, 2);
+        let expected_score = 4;
+        assert_eq!(total_score, expected_score);
     }
 }
