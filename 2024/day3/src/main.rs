@@ -39,7 +39,7 @@ fn part_2(input: &str) -> i32 {
 }
 
 fn main() {
-    let input = fs::read_to_string("input").expect("Failed to read the file");
+    let input = fs::read_to_string("input").expect("Failed to read input file");
     let result_part_1 = part_1(&input);
     println!("[Part 1] {}", result_part_1);
     let result_part_2 = part_2(&input);
