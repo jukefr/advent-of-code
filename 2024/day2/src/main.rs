@@ -31,7 +31,8 @@ fn part_2(levels: &Vec<i32>) -> bool {
     false
 }
 
-fn analyze(input: &str, part: u8) -> usize {
+fn main() {
+    let input = fs::read_to_string("input").expect("Failed to read input file");
     let reports: Vec<Vec<i32>> = input
         .lines()
         .map(|line| {
@@ -40,35 +41,23 @@ fn analyze(input: &str, part: u8) -> usize {
                 .collect()
         })
         .collect();
-    let mut safe_count = 0;
+    let mut safe_count_part_1 = 0;
+    let mut safe_count_part_2 = 0;
     for report in reports {
-        if part == 1 {
-            if part_1(&report) {
-                safe_count += 1;
-            }
-        } else if part == 2 {
-            if part_2(&report) {
-                safe_count += 1;
-            }
+        if part_1(&report) {
+            safe_count_part_1 += 1;
+        }
+        if part_2(&report) {
+            safe_count_part_2 += 1;
         }
     }
-    safe_count
-}
-
-fn main() {
-    let input = fs::read_to_string("input").expect("Failed to read the file");
-    let safe_reports = analyze(&input, 1);
-    println!("[Part 1] {}", safe_reports);
-    let safe_reports = analyze(&input, 2);
-    println!("[Part 2] {}", safe_reports);
+    println!("[Part 1] {}", safe_count_part_1);
+    println!("[Part 2] {}", safe_count_part_2);
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
-    fn parse_input(input: &str) -> String {
-        input.trim().to_string()
-    }
     #[test]
     fn test_part_1() {
         let input = "\
@@ -79,9 +68,19 @@ mod tests {
             8 6 4 4 1
             1 3 6 7 9
         ";
-        let parsed_input = parse_input(input);
-        let total_score = analyze(&parsed_input, 1);
-        assert_eq!(total_score, 2);
+        let reports: Vec<Vec<i32>> = input
+            .trim()
+            .lines()
+            .map(|line| {
+                line.trim()
+                    .split_whitespace()
+                    .map(|n| n.parse().unwrap())
+                    .collect()
+            })
+            .collect();
+        let total_score = reports.iter().filter(|&report| part_1(report)).count();
+        let expected_score = 2;
+        assert_eq!(total_score, expected_score);
     }
     #[test]
     fn test_part_2() {
@@ -93,8 +92,18 @@ mod tests {
             8 6 4 4 1
             1 3 6 7 9
         ";
-        let parsed_input = parse_input(input);
-        let total_score = analyze(&parsed_input, 2);
-        assert_eq!(total_score, 4);
+        let reports: Vec<Vec<i32>> = input
+            .trim()
+            .lines()
+            .map(|line| {
+                line.trim()
+                    .split_whitespace()
+                    .map(|n| n.parse().unwrap())
+                    .collect()
+            })
+            .collect();
+        let total_score = reports.iter().filter(|&report| part_2(report)).count();
+        let expected_score = 4;
+        assert_eq!(total_score, expected_score);
     }
 }
