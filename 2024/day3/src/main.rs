@@ -1,20 +1,20 @@
 use regex::Regex;
 use std::fs;
 
-fn part_1(input_string: &str) -> i32 {
+fn part_1(input_string: &str) -> u32 {
     let multiplication_regex = Regex::new(r"mul\((\d+),(\d+)\)").unwrap();
     input_string
         .lines()
         .flat_map(|line| multiplication_regex.captures_iter(line))
         .filter_map(|capture_groups| {
-            let first_number: i32 = capture_groups[1].parse().ok()?;
-            let second_number: i32 = capture_groups[2].parse().ok()?;
+            let first_number: u32 = capture_groups[1].parse().ok()?;
+            let second_number: u32 = capture_groups[2].parse().ok()?;
             Some(first_number * second_number)
         })
         .sum()
 }
 
-fn part_2(input_string: &str) -> i32 {
+fn part_2(input_string: &str) -> u32 {
     let action_regex = Regex::new(
         r"(?x)
         mul\((\d+),(\d+)\) |
@@ -37,8 +37,8 @@ fn part_2(input_string: &str) -> i32 {
                 None
             }
             _multiplication_action if is_action_enabled => {
-                let first_number = capture_groups[1].parse::<i32>().ok()?;
-                let second_number = capture_groups[2].parse::<i32>().ok()?;
+                let first_number = capture_groups[1].parse::<u32>().ok()?;
+                let second_number = capture_groups[2].parse::<u32>().ok()?;
                 Some(first_number * second_number)
             }
             _ => None,
