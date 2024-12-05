@@ -1,11 +1,6 @@
 use std::fs;
 
-fn part_1(grid: &Vec<Vec<char>>) -> usize {
-    let rows = grid.len();
-    let cols = grid[0].len();
-    let word = ['X', 'M', 'A', 'S'];
-    let word_len = word.len();
-    let mut count = 0;
+fn part_1(grid: &[Vec<char>]) -> usize {
     let directions = [
         (0, 1),
         (1, 0),
@@ -16,36 +11,37 @@ fn part_1(grid: &Vec<Vec<char>>) -> usize {
         (-1, -1),
         (-1, 1),
     ];
-    for r in 0..rows {
-        for c in 0..cols {
-            for &(dr, dc) in &directions {
-                let mut found = true;
-                for i in 0..word_len {
-                    let nr = r as isize + dr * i as isize;
-                    let nc = c as isize + dc * i as isize;
-                    if nr < 0 || nr >= rows as isize || nc < 0 || nc >= cols as isize {
-                        found = false;
-                        break;
-                    }
-                    if grid[nr as usize][nc as usize] != word[i] {
-                        found = false;
-                        break;
-                    }
+    let word = ['X', 'M', 'A', 'S'];
+    let word_len = word.len();
+    grid.iter()
+        .enumerate()
+        .flat_map(|(r, row)| {
+            row.iter().enumerate().filter_map(move |(c, _)| {
+                let matches = directions
+                    .iter()
+                    .filter(|&&(dr, dc)| {
+                        (0..word_len).all(|i| {
+                            let nr = r as isize + dr * i as isize;
+                            let nc = c as isize + dc * i as isize;
+                            nr >= 0
+                                && nr < grid.len() as isize
+                                && nc >= 0
+                                && nc < row.len() as isize
+                                && grid[nr as usize][nc as usize] == word[i]
+                        })
+                    })
+                    .count();
+                if matches > 0 {
+                    Some(matches)
+                } else {
+                    None
                 }
-                if found {
-                    count += 1;
-                }
-            }
-        }
-    }
-    count
+            })
+        })
+        .sum::<usize>()
 }
 
-fn part_2(grid: &Vec<Vec<char>>) -> usize {
-    let rows = grid.len();
-    let cols = grid[0].len();
-    let mut count = 0;
-    let in_bounds = |r: isize, c: isize| r >= 0 && r < rows as isize && c >= 0 && c < cols as isize;
+fn part_2(grid: &[Vec<char>]) -> usize {
     let patterns = [
         [(0, 0), (0, 2), (1, 1), (2, 0), (2, 2)],
         [(0, 0), (0, 2), (1, 1), (2, 0), (2, 2)],
@@ -58,43 +54,46 @@ fn part_2(grid: &Vec<Vec<char>>) -> usize {
         vec!['M', 'S', 'A', 'M', 'S'],
         vec!['S', 'M', 'A', 'S', 'M'],
     ];
-    let matches_pattern = |r: usize, c: usize, pattern: &[(isize, isize)], keys: &[char]| -> bool {
-        for (i, &(dr, dc)) in pattern.iter().enumerate() {
-            let nr = r as isize + dr;
-            let nc = c as isize + dc;
-            if !in_bounds(nr, nc) {
-                return false;
-            }
-            if let Some(&key) = keys.get(i) {
-                if grid[nr as usize][nc as usize] != key {
-                    return false;
+    grid.iter()
+        .enumerate()
+        .flat_map(|(r, row)| {
+            row.iter().enumerate().filter_map({
+                let value = expected_letters.clone();
+                move |(c, _)| {
+                    let matches = patterns
+                        .iter()
+                        .zip(value.iter())
+                        .filter(|(pattern, keys)| {
+                            pattern.iter().enumerate().all(|(i, &(dr, dc))| {
+                                let nr = r as isize + dr;
+                                let nc = c as isize + dc;
+                                nr >= 0
+                                    && nr < grid.len() as isize
+                                    && nc >= 0
+                                    && nc < row.len() as isize
+                                    && grid[nr as usize][nc as usize] == keys[i]
+                            })
+                        })
+                        .count();
+                    if matches > 0 {
+                        Some(matches)
+                    } else {
+                        None
+                    }
                 }
-            }
-        }
-        true
-    };
-    for r in 0..rows {
-        for c in 0..cols {
-            for (pattern, keys) in patterns.iter().zip(expected_letters.iter()) {
-                if matches_pattern(r, c, pattern, keys) {
-                    count += 1;
-                }
-            }
-        }
-    }
-    count
+            })
+        })
+        .sum::<usize>()
 }
 
 fn main() {
     let contents = fs::read_to_string("input").expect("Failed to read input file");
     let grid: Vec<Vec<char>> = contents
         .lines()
-        .map(|line| line.chars().collect())
+        .map(|line| line.trim().chars().collect())
         .collect();
-    let count_part_1 = part_1(&grid);
-    println!("[Part 1] {}", count_part_1);
-    let count_part_2 = part_2(&grid);
-    println!("[Part 2] {}", count_part_2);
+    println!("[Part 1] {}", part_1(&grid));
+    println!("[Part 2] {}", part_2(&grid));
 }
 
 #[cfg(test)]
@@ -121,9 +120,8 @@ mod tests {
             MAMMMXMMMM
             MXMXAXMASX
         ";
-        let grid = parse_grid(input.trim());
-        let count = part_1(&grid);
-        assert_eq!(count, 18);
+        let grid = parse_grid(input);
+        assert_eq!(part_1(&grid), 18);
     }
     #[test]
     fn test_part_2() {
@@ -139,8 +137,7 @@ mod tests {
             M.M.M.M.M.
             ..........
         ";
-        let grid = parse_grid(input.trim());
-        let count = part_2(&grid);
-        assert_eq!(count, 9);
+        let grid = parse_grid(input);
+        assert_eq!(part_2(&grid), 9);
     }
 }
