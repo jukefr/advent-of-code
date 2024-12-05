@@ -1,79 +1,73 @@
-use std::collections::HashMap;
 use std::fs;
 
-fn part_1(input: &str) -> i32 {
-    let (mut left, mut right): (Vec<i32>, Vec<i32>) = input
+fn part_1(input: &str) -> u32 {
+    let (mut left_values, mut right_values): (Vec<u32>, Vec<u32>) = input
         .lines()
         .map(|line| {
             let mut parts = line.split_whitespace();
             (
-                parts.next().unwrap().parse::<i32>().unwrap(),
-                parts.next().unwrap().parse::<i32>().unwrap(),
+                parts.next().unwrap().parse::<u32>().unwrap(),
+                parts.next().unwrap().parse::<u32>().unwrap(),
             )
         })
         .unzip();
-    left.sort_unstable();
-    right.sort_unstable();
-    left.iter()
-        .zip(right.iter())
-        .map(|(l, r)| (l - r).abs())
+    left_values.sort_unstable();
+    right_values.sort_unstable();
+    left_values
+        .iter()
+        .zip(right_values.iter())
+        .map(|(left_value, right_value)| left_value.abs_diff(*right_value))
         .sum()
 }
 
-fn part_2(input: &str) -> i32 {
-    let (left, right): (Vec<i32>, Vec<i32>) = input
+fn part_2(input: &str) -> u32 {
+    let (left_values, right_values): (Vec<u32>, Vec<u32>) = input
         .lines()
         .map(|line| {
             let mut parts = line.split_whitespace();
             (
-                parts.next().unwrap().parse::<i32>().unwrap(),
-                parts.next().unwrap().parse::<i32>().unwrap(),
+                parts.next().unwrap().parse::<u32>().unwrap(),
+                parts.next().unwrap().parse::<u32>().unwrap(),
             )
         })
         .unzip();
-    let mut right_counts = HashMap::new();
-    for &num in &right {
-        *right_counts.entry(num).or_insert(0) += 1;
-    }
-    left.iter()
-        .map(|&num| {
-            let count = right_counts.get(&num).unwrap_or(&0);
-            num * count
+    let max_right_value = *right_values.iter().max().unwrap();
+    let mut right_values_count = vec![0; max_right_value as usize + 1];
+    right_values.iter().for_each(|&right_value| {
+        right_values_count[right_value as usize] += 1;
+    });
+    left_values
+        .iter()
+        .map(|&left_value| {
+            let count = right_values_count.get(left_value as usize).unwrap_or(&0);
+            left_value * count
         })
         .sum()
 }
 
 fn main() {
-    let input = fs::read_to_string("input").expect("Failed to read input file");
-    let total_distance = part_1(&input);
-    println!("[Part 1] {}", total_distance);
-    let similarity_score = part_2(&input);
-    println!("[Part 2] {}", similarity_score);
+    let input_data = fs::read_to_string("input").expect("Failed to read input file");
+    println!("[Part 1] {}", part_1(&input_data));
+    println!("[Part 2] {}", part_2(&input_data));
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
+    const TEST_INPUT_STRING: &str = "\
+        3   4
+        4   3
+        2   5
+        1   3
+        3   9
+        3   3
+    ";
     #[test]
     fn test_part_1() {
-        let input = "\
-            3   4
-            4   3
-            2   5
-            1   3
-            3   9
-            3   3";
-        assert_eq!(part_1(input), 11);
+        assert_eq!(part_1(TEST_INPUT_STRING.trim()), 11);
     }
     #[test]
     fn test_part_2() {
-        let input = "\
-            3   4
-            4   3
-            2   5
-            1   3
-            3   9
-            3   3";
-        assert_eq!(part_2(input), 31);
+        assert_eq!(part_2(TEST_INPUT_STRING.trim()), 31);
     }
 }
