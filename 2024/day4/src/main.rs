@@ -116,22 +116,25 @@ fn main() {
 mod tests {
     use super::*;
     fn parse_grid(input: &str) -> Vec<Vec<char>> {
-        input.lines().map(|line| line.chars().collect()).collect()
+        input
+            .lines()
+            .map(|line| line.trim().chars().collect())
+            .collect()
     }
     #[test]
     fn test_part_1() {
         let input = "\
-MMMSXXMASM
-MSAMXMSMSA
-AMXSXMAAMM
-MSAMASMSMX
-XMASAMXAMM
-XXAMMXXAMA
-SMSMSASXSS
-SAXAMASAAA
-MAMMMXMMMM
-MXMXAXMASX
-";
+            MMMSXXMASM
+            MSAMXMSMSA
+            AMXSXMAAMM
+            MSAMASMSMX
+            XMASAMXAMM
+            XXAMMXXAMA
+            SMSMSASXSS
+            SAXAMASAAA
+            MAMMMXMMMM
+            MXMXAXMASX
+        ";
         let grid = parse_grid(input.trim());
         let count = part_1(&grid);
         assert_eq!(count, 18);
@@ -139,17 +142,17 @@ MXMXAXMASX
     #[test]
     fn test_part_2() {
         let input = "\
-.M.S......
-..A..MSMS.
-.M.S.MAA..
-..A.ASMSM.
-.M.S.M....
-..........
-S.S.S.S.S.
-.A.A.A.A..
-M.M.M.M.M.
-..........
-";
+            .M.S......
+            ..A..MSMS.
+            .M.S.MAA..
+            ..A.ASMSM.
+            .M.S.M....
+            ..........
+            S.S.S.S.S.
+            .A.A.A.A..
+            M.M.M.M.M.
+            ..........
+        ";
         let grid = parse_grid(input.trim());
         let count = part_2(&grid);
         assert_eq!(count, 9);
