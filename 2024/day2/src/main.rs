@@ -1,23 +1,23 @@
 use std::fs;
 
-fn part_1(levels: &[i32]) -> bool {
+fn part_1(levels: &[u32]) -> bool {
     let mut is_increasing = true;
     let mut is_decreasing = true;
     levels.windows(2).all(|pair| {
-        let level_difference = pair[1] - pair[0];
-        if level_difference.abs() < 1 || level_difference.abs() > 3 {
+        let level_difference = pair[1].abs_diff(pair[0]);
+        if level_difference < 1 || level_difference > 3 {
             return false;
         }
-        if level_difference > 0 {
+        if pair[1] > pair[0] {
             is_decreasing = false;
-        } else if level_difference < 0 {
+        } else if pair[0] > pair[1] {
             is_increasing = false;
         }
         true
     }) && (is_increasing || is_decreasing)
 }
 
-fn part_2(levels: &[i32]) -> bool {
+fn part_2(levels: &[u32]) -> bool {
     if part_1(levels) {
         return true;
     }
@@ -30,7 +30,7 @@ fn part_2(levels: &[i32]) -> bool {
 
 fn main() {
     let input_file_contents = fs::read_to_string("input").expect("Failed to read input file");
-    let reports: Vec<Vec<i32>> = input_file_contents
+    let reports: Vec<Vec<u32>> = input_file_contents
         .lines()
         .map(|line| {
             line.split_whitespace()
@@ -61,7 +61,7 @@ mod tests {
     ";
     #[test]
     fn test_part_1() {
-        let reports: Vec<Vec<i32>> = TEST_INPUT_STRING
+        let reports: Vec<Vec<u32>> = TEST_INPUT_STRING
             .trim()
             .lines()
             .map(|line| {
@@ -74,7 +74,7 @@ mod tests {
     }
     #[test]
     fn test_part_2() {
-        let reports: Vec<Vec<i32>> = TEST_INPUT_STRING
+        let reports: Vec<Vec<u32>> = TEST_INPUT_STRING
             .trim()
             .lines()
             .map(|line| {
