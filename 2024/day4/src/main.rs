@@ -1,6 +1,6 @@
 use std::fs;
 
-fn part_1(grid: &[Vec<char>]) -> usize {
+fn part_1(grid: &[Vec<char>]) -> u32 {
     let direction_vectors = [
         (0, 1),
         (1, 0),
@@ -35,16 +35,16 @@ fn part_1(grid: &[Vec<char>]) -> usize {
                     })
                     .count();
                 if matching_directions_count > 0 {
-                    Some(matching_directions_count)
+                    Some(matching_directions_count as u32)
                 } else {
                     None
                 }
             })
         })
-        .sum::<usize>()
+        .sum::<u32>()
 }
 
-fn part_2(grid: &[Vec<char>]) -> usize {
+fn part_2(grid: &[Vec<char>]) -> u32 {
     let pattern_offsets = [
         [(0, 0), (0, 2), (1, 1), (2, 0), (2, 2)],
         [(0, 0), (0, 2), (1, 1), (2, 0), (2, 2)],
@@ -82,14 +82,14 @@ fn part_2(grid: &[Vec<char>]) -> usize {
                         })
                         .count();
                     if matching_patterns_count > 0 {
-                        Some(matching_patterns_count)
+                        Some(matching_patterns_count as u32)
                     } else {
                         None
                     }
                 }
             })
         })
-        .sum::<usize>()
+        .sum::<u32>()
 }
 
 fn main() {
