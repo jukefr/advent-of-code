@@ -1,37 +1,38 @@
 use std::fs;
 
-fn part_1(rules: &Vec<&str>, updates: &Vec<&str>) -> u32 {
-    let rules_numbers: Vec<Vec<u32>> = rules
+fn part_1(rule_strings: &Vec<&str>, update_strings: &Vec<&str>) -> u32 {
+    let rule_pairs: Vec<Vec<u32>> = rule_strings
         .iter()
-        .map(|rule| {
-            rule.split('|')
+        .map(|rule_string| {
+            rule_string
+                .split('|')
                 .map(|page| page.trim())
                 .filter_map(|page| page.parse::<u32>().ok())
                 .collect()
         })
         .collect();
-    let updates_numbers: Vec<Vec<u32>> = updates
+    let update_pages_lists: Vec<Vec<u32>> = update_strings
         .iter()
-        .map(|update| {
-            update
+        .map(|update_string| {
+            update_string
                 .split(',')
                 .map(|page| page.trim())
                 .filter_map(|page| page.parse::<u32>().ok())
                 .collect()
         })
         .collect();
-    updates_numbers
+    update_pages_lists
         .iter()
         .map(|update_pages| {
-            let is_valid_update = rules_numbers.iter().all(|rule| {
-                let (first_rule, second_rule) = (rule[0], rule[1]);
-                let first_page_position = update_pages.iter().position(|&page| page == first_rule);
+            let is_valid_update = rule_pairs.iter().all(|rule_pair| {
+                let (first_page, second_page) = (rule_pair[0], rule_pair[1]);
+                let first_page_position = update_pages.iter().position(|&page| page == first_page);
                 let second_page_position =
-                    update_pages.iter().position(|&page| page == second_rule);
-                if let (Some(found_first_position), Some(found_second_position)) =
+                    update_pages.iter().position(|&page| page == second_page);
+                if let (Some(first_position), Some(second_position)) =
                     (first_page_position, second_page_position)
                 {
-                    found_first_position < found_second_position
+                    first_position < second_position
                 } else {
                     true
                 }
@@ -45,38 +46,39 @@ fn part_1(rules: &Vec<&str>, updates: &Vec<&str>) -> u32 {
         .sum()
 }
 
-fn part_2(rules: &Vec<&str>, updates: &Vec<&str>) -> u32 {
-    let rules_numbers: Vec<Vec<u32>> = rules
+fn part_2(rule_strings: &Vec<&str>, update_strings: &Vec<&str>) -> u32 {
+    let rule_pairs: Vec<Vec<u32>> = rule_strings
         .iter()
-        .map(|rule| {
-            rule.split('|')
+        .map(|rule_string| {
+            rule_string
+                .split('|')
                 .map(|page| page.trim())
                 .filter_map(|page| page.parse::<u32>().ok())
                 .collect()
         })
         .collect();
-    let updates_numbers: Vec<Vec<u32>> = updates
+    let update_pages_lists: Vec<Vec<u32>> = update_strings
         .iter()
-        .map(|update| {
-            update
+        .map(|update_string| {
+            update_string
                 .split(',')
                 .map(|page| page.trim())
                 .filter_map(|page| page.parse::<u32>().ok())
                 .collect()
         })
         .collect();
-    let invalid_updates: Vec<Vec<u32>> = updates_numbers
+    let invalid_update_pages_lists: Vec<Vec<u32>> = update_pages_lists
         .iter()
         .filter_map(|update_pages| {
-            let is_valid_update = rules_numbers.iter().all(|rule| {
-                let (first_rule, second_rule) = (rule[0], rule[1]);
-                let first_page_position = update_pages.iter().position(|&page| page == first_rule);
+            let is_valid_update = rule_pairs.iter().all(|rule_pair| {
+                let (first_page, second_page) = (rule_pair[0], rule_pair[1]);
+                let first_page_position = update_pages.iter().position(|&page| page == first_page);
                 let second_page_position =
-                    update_pages.iter().position(|&page| page == second_rule);
-                if let (Some(found_first_position), Some(found_second_position)) =
+                    update_pages.iter().position(|&page| page == second_page);
+                if let (Some(first_position), Some(second_position)) =
                     (first_page_position, second_page_position)
                 {
-                    found_first_position < found_second_position
+                    first_position < second_position
                 } else {
                     true
                 }
@@ -88,54 +90,54 @@ fn part_2(rules: &Vec<&str>, updates: &Vec<&str>) -> u32 {
             }
         })
         .collect();
-    let mut fixed_updates = invalid_updates.clone();
-    let mut is_updates_fixed = false;
-    while !is_updates_fixed {
-        is_updates_fixed = true;
-        let updated_invalid_updates: Vec<Vec<u32>> = fixed_updates
+    let mut corrected_update_pages_lists = invalid_update_pages_lists.clone();
+    let mut is_updates_corrected = false;
+    while !is_updates_corrected {
+        is_updates_corrected = true;
+        let updated_invalid_update_pages_lists: Vec<Vec<u32>> = corrected_update_pages_lists
             .iter()
-            .map(|invalid_update| {
-                rules_numbers
+            .map(|invalid_update_pages| {
+                rule_pairs
                     .iter()
-                    .fold(invalid_update.clone(), |mut update, rule| {
-                        let (first_rule, second_rule) = (rule[0], rule[1]);
+                    .fold(invalid_update_pages.clone(), |mut update, rule_pair| {
+                        let (first_page, second_page) = (rule_pair[0], rule_pair[1]);
                         let first_page_position =
-                            update.iter().position(|&page| page == first_rule);
+                            update.iter().position(|&page| page == first_page);
                         let second_page_position =
-                            update.iter().position(|&page| page == second_rule);
-                        if let (Some(found_first_position), Some(found_second_position)) =
+                            update.iter().position(|&page| page == second_page);
+                        if let (Some(first_position), Some(second_position)) =
                             (first_page_position, second_page_position)
                         {
-                            if found_first_position > found_second_position {
-                                update.swap(found_first_position, found_second_position);
-                                is_updates_fixed = false;
+                            if first_position > second_position {
+                                update.swap(first_position, second_position);
+                                is_updates_corrected = false;
                             }
                         }
                         update
                     })
             })
             .collect();
-        fixed_updates = updated_invalid_updates;
+        corrected_update_pages_lists = updated_invalid_update_pages_lists;
     }
-    fixed_updates
+    corrected_update_pages_lists
         .iter()
-        .map(|update| update[update.len() / 2])
+        .map(|update_pages| update_pages[update_pages.len() / 2])
         .sum()
 }
 
 fn main() {
-    let contents = fs::read_to_string("input").unwrap();
-    let (rules_string, updates_string) = contents.split_once("\n\n").unwrap();
-    let rules: Vec<&str> = rules_string.lines().collect();
-    let updates: Vec<&str> = updates_string.lines().collect();
-    println!("[Part 1] {}", part_1(&rules, &updates));
-    println!("[Part 2] {}", part_2(&rules, &updates));
+    let input_file_contents = fs::read_to_string("input").unwrap();
+    let (rules_string, updates_string) = input_file_contents.split_once("\n\n").unwrap();
+    let rule_strings: Vec<&str> = rules_string.lines().collect();
+    let update_strings: Vec<&str> = updates_string.lines().collect();
+    println!("[Part 1] {}", part_1(&rule_strings, &update_strings));
+    println!("[Part 2] {}", part_2(&rule_strings, &update_strings));
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
-    const TEST_INPUT: &str = "\
+    const TEST_INPUT_STRING: &str = "\
         47|53
         97|13
         97|61
@@ -167,16 +169,16 @@ mod tests {
     ";
     #[test]
     fn test_part_1() {
-        let (rules_string, updates_string) = TEST_INPUT.trim().split_once("\n\n").unwrap();
-        let rules: Vec<&str> = rules_string.lines().collect();
-        let updates: Vec<&str> = updates_string.lines().collect();
-        assert_eq!(part_1(&rules, &updates), 143);
+        let (rules_string, updates_string) = TEST_INPUT_STRING.trim().split_once("\n\n").unwrap();
+        let rule_strings: Vec<&str> = rules_string.lines().collect();
+        let update_strings: Vec<&str> = updates_string.lines().collect();
+        assert_eq!(part_1(&rule_strings, &update_strings), 143);
     }
     #[test]
     fn test_part_2() {
-        let (rules_string, updates_string) = TEST_INPUT.trim().split_once("\n\n").unwrap();
-        let rules: Vec<&str> = rules_string.lines().collect();
-        let updates: Vec<&str> = updates_string.lines().collect();
-        assert_eq!(part_2(&rules, &updates), 123);
+        let (rules_string, updates_string) = TEST_INPUT_STRING.trim().split_once("\n\n").unwrap();
+        let rule_strings: Vec<&str> = rules_string.lines().collect();
+        let update_strings: Vec<&str> = updates_string.lines().collect();
+        assert_eq!(part_2(&rule_strings, &update_strings), 123);
     }
 }
