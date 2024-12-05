@@ -86,8 +86,7 @@ fn part_2(grid: &Vec<Vec<char>>) -> usize {
 }
 
 fn main() {
-    let file_path = "input";
-    let contents = fs::read_to_string(file_path).expect("Failed to read input file");
+    let contents = fs::read_to_string("input").expect("Failed to read input file");
     let grid: Vec<Vec<char>> = contents
         .lines()
         .map(|line| line.chars().collect())
