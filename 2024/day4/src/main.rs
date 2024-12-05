@@ -120,7 +120,7 @@ mod tests {
     }
     #[test]
     fn test_part_1() {
-        let input = r#"
+        let input = "\
 MMMSXXMASM
 MSAMXMSMSA
 AMXSXMAAMM
@@ -131,14 +131,14 @@ SMSMSASXSS
 SAXAMASAAA
 MAMMMXMMMM
 MXMXAXMASX
-"#;
+";
         let grid = parse_grid(input.trim());
         let count = part_1(&grid);
         assert_eq!(count, 18);
     }
     #[test]
     fn test_part_2() {
-        let input = r#"
+        let input = "\
 .M.S......
 ..A..MSMS.
 .M.S.MAA..
@@ -149,7 +149,7 @@ S.S.S.S.S.
 .A.A.A.A..
 M.M.M.M.M.
 ..........
-"#;
+";
         let grid = parse_grid(input.trim());
         let count = part_2(&grid);
         assert_eq!(count, 9);
