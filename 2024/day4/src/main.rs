@@ -1,5 +1,4 @@
-use std::fs::File;
-use std::io::{self, BufRead};
+use std::fs;
 
 fn part_1(grid: &Vec<Vec<char>>) -> usize {
     let rows = grid.len();
@@ -88,11 +87,10 @@ fn part_2(grid: &Vec<Vec<char>>) -> usize {
 
 fn main() {
     let file_path = "input";
-    let file = File::open(file_path).expect("Failed to read input file");
-    let reader = io::BufReader::new(file);
-    let grid: Vec<Vec<char>> = reader
+    let contents = fs::read_to_string(file_path).expect("Failed to read input file");
+    let grid: Vec<Vec<char>> = contents
         .lines()
-        .map(|line| line.unwrap().chars().collect())
+        .map(|line| line.chars().collect())
         .collect();
     let count_part_1 = part_1(&grid);
     println!("[Part 1] {}", count_part_1);
