@@ -1,109 +1,88 @@
 use std::fs;
 
-fn part_1(levels: &Vec<i32>) -> bool {
-    let mut increasing = true;
-    let mut decreasing = true;
-    for i in 1..levels.len() {
-        let diff = levels[i] - levels[i - 1];
-        if diff.abs() < 1 || diff.abs() > 3 {
+fn part_1(levels: &[i32]) -> bool {
+    let mut is_increasing = true;
+    let mut is_decreasing = true;
+    levels.windows(2).all(|pair| {
+        let level_difference = pair[1] - pair[0];
+        if level_difference.abs() < 1 || level_difference.abs() > 3 {
             return false;
         }
-        if diff > 0 {
-            decreasing = false;
-        } else if diff < 0 {
-            increasing = false;
+        if level_difference > 0 {
+            is_decreasing = false;
+        } else if level_difference < 0 {
+            is_increasing = false;
         }
-    }
-    increasing || decreasing
+        true
+    }) && (is_increasing || is_decreasing)
 }
 
-fn part_2(levels: &Vec<i32>) -> bool {
+fn part_2(levels: &[i32]) -> bool {
     if part_1(levels) {
         return true;
     }
-    for i in 0..levels.len() {
-        let mut new_levels = levels.clone();
-        new_levels.remove(i);
-        if part_1(&new_levels) {
-            return true;
-        }
-    }
-    false
+    (0..levels.len()).any(|i| {
+        let mut modified_levels = levels.to_vec();
+        modified_levels.remove(i);
+        part_1(&modified_levels)
+    })
 }
 
 fn main() {
-    let input = fs::read_to_string("input").expect("Failed to read input file");
-    let reports: Vec<Vec<i32>> = input
+    let input_file_contents = fs::read_to_string("input").expect("Failed to read input file");
+    let reports: Vec<Vec<i32>> = input_file_contents
         .lines()
         .map(|line| {
             line.split_whitespace()
-                .map(|n| n.parse().unwrap())
+                .filter_map(|number| number.parse().ok())
                 .collect()
         })
         .collect();
-    let mut safe_count_part_1 = 0;
-    let mut safe_count_part_2 = 0;
-    for report in reports {
-        if part_1(&report) {
-            safe_count_part_1 += 1;
-        }
-        if part_2(&report) {
-            safe_count_part_2 += 1;
-        }
-    }
-    println!("[Part 1] {}", safe_count_part_1);
-    println!("[Part 2] {}", safe_count_part_2);
+    println!(
+        "[Part 1] {}",
+        reports.iter().filter(|&report| part_1(report)).count()
+    );
+    println!(
+        "[Part 2] {}",
+        reports.iter().filter(|&report| part_2(report)).count()
+    );
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
+    const TEST_INPUT_STRING: &str = "\
+        7 6 4 2 1
+        1 2 7 8 9
+        9 7 6 2 1
+        1 3 2 4 5
+        8 6 4 4 1
+        1 3 6 7 9
+    ";
     #[test]
     fn test_part_1() {
-        let input = "\
-            7 6 4 2 1
-            1 2 7 8 9
-            9 7 6 2 1
-            1 3 2 4 5
-            8 6 4 4 1
-            1 3 6 7 9
-        ";
-        let reports: Vec<Vec<i32>> = input
+        let reports: Vec<Vec<i32>> = TEST_INPUT_STRING
             .trim()
             .lines()
             .map(|line| {
-                line.trim()
-                    .split_whitespace()
-                    .map(|n| n.parse().unwrap())
+                line.split_whitespace()
+                    .filter_map(|number| number.parse().ok())
                     .collect()
             })
             .collect();
-        let total_score = reports.iter().filter(|&report| part_1(report)).count();
-        let expected_score = 2;
-        assert_eq!(total_score, expected_score);
+        assert_eq!(reports.iter().filter(|&report| part_1(report)).count(), 2);
     }
     #[test]
     fn test_part_2() {
-        let input = "\
-            7 6 4 2 1
-            1 2 7 8 9
-            9 7 6 2 1
-            1 3 2 4 5
-            8 6 4 4 1
-            1 3 6 7 9
-        ";
-        let reports: Vec<Vec<i32>> = input
+        let reports: Vec<Vec<i32>> = TEST_INPUT_STRING
             .trim()
             .lines()
             .map(|line| {
-                line.trim()
-                    .split_whitespace()
-                    .map(|n| n.parse().unwrap())
+                line.split_whitespace()
+                    .filter_map(|number| number.parse().ok())
                     .collect()
             })
             .collect();
-        let total_score = reports.iter().filter(|&report| part_2(report)).count();
-        let expected_score = 4;
-        assert_eq!(total_score, expected_score);
+        assert_eq!(reports.iter().filter(|&report| part_2(report)).count(), 4);
     }
 }
