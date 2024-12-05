@@ -1,7 +1,7 @@
 use std::fs;
 
 fn part_1(grid: &[Vec<char>]) -> usize {
-    let directions = [
+    let direction_vectors = [
         (0, 1),
         (1, 0),
         (1, 1),
@@ -11,28 +11,31 @@ fn part_1(grid: &[Vec<char>]) -> usize {
         (-1, -1),
         (-1, 1),
     ];
-    let word = ['X', 'M', 'A', 'S'];
-    let word_len = word.len();
+    let target_word = ['X', 'M', 'A', 'S'];
+    let target_word_length = target_word.len();
     grid.iter()
         .enumerate()
-        .flat_map(|(r, row)| {
-            row.iter().enumerate().filter_map(move |(c, _)| {
-                let matches = directions
+        .flat_map(|(row_index, row)| {
+            row.iter().enumerate().filter_map(move |(col_index, _)| {
+                let matching_directions_count = direction_vectors
                     .iter()
-                    .filter(|&&(dr, dc)| {
-                        (0..word_len).all(|i| {
-                            let nr = r as isize + dr * i as isize;
-                            let nc = c as isize + dc * i as isize;
-                            nr >= 0
-                                && nr < grid.len() as isize
-                                && nc >= 0
-                                && nc < row.len() as isize
-                                && grid[nr as usize][nc as usize] == word[i]
+                    .filter(|&&(direction_row_offset, direction_col_offset)| {
+                        (0..target_word_length).all(|word_index| {
+                            let next_row_index =
+                                row_index as isize + direction_row_offset * word_index as isize;
+                            let next_col_index =
+                                col_index as isize + direction_col_offset * word_index as isize;
+                            next_row_index >= 0
+                                && next_row_index < grid.len() as isize
+                                && next_col_index >= 0
+                                && next_col_index < row.len() as isize
+                                && grid[next_row_index as usize][next_col_index as usize]
+                                    == target_word[word_index]
                         })
                     })
                     .count();
-                if matches > 0 {
-                    Some(matches)
+                if matching_directions_count > 0 {
+                    Some(matching_directions_count)
                 } else {
                     None
                 }
@@ -42,13 +45,13 @@ fn part_1(grid: &[Vec<char>]) -> usize {
 }
 
 fn part_2(grid: &[Vec<char>]) -> usize {
-    let patterns = [
+    let pattern_offsets = [
         [(0, 0), (0, 2), (1, 1), (2, 0), (2, 2)],
         [(0, 0), (0, 2), (1, 1), (2, 0), (2, 2)],
         [(0, 0), (0, 2), (1, 1), (2, 0), (2, 2)],
         [(0, 0), (0, 2), (1, 1), (2, 0), (2, 2)],
     ];
-    let expected_letters = [
+    let expected_characters = [
         vec!['M', 'M', 'A', 'S', 'S'],
         vec!['S', 'S', 'A', 'M', 'M'],
         vec!['M', 'S', 'A', 'M', 'S'],
@@ -56,27 +59,30 @@ fn part_2(grid: &[Vec<char>]) -> usize {
     ];
     grid.iter()
         .enumerate()
-        .flat_map(|(r, row)| {
+        .flat_map(|(row_index, row)| {
             row.iter().enumerate().filter_map({
-                let value = expected_letters.clone();
-                move |(c, _)| {
-                    let matches = patterns
+                let patterns_to_check = expected_characters.clone();
+                move |(col_index, _)| {
+                    let matching_patterns_count = pattern_offsets
                         .iter()
-                        .zip(value.iter())
-                        .filter(|(pattern, keys)| {
-                            pattern.iter().enumerate().all(|(i, &(dr, dc))| {
-                                let nr = r as isize + dr;
-                                let nc = c as isize + dc;
-                                nr >= 0
-                                    && nr < grid.len() as isize
-                                    && nc >= 0
-                                    && nc < row.len() as isize
-                                    && grid[nr as usize][nc as usize] == keys[i]
-                            })
+                        .zip(patterns_to_check.iter())
+                        .filter(|(pattern_offset, expected_chars)| {
+                            pattern_offset.iter().enumerate().all(
+                                |(offset_index, &(row_offset, col_offset))| {
+                                    let next_row_index = row_index as isize + row_offset;
+                                    let next_col_index = col_index as isize + col_offset;
+                                    next_row_index >= 0
+                                        && next_row_index < grid.len() as isize
+                                        && next_col_index >= 0
+                                        && next_col_index < row.len() as isize
+                                        && grid[next_row_index as usize][next_col_index as usize]
+                                            == expected_chars[offset_index]
+                                },
+                            )
                         })
                         .count();
-                    if matches > 0 {
-                        Some(matches)
+                    if matching_patterns_count > 0 {
+                        Some(matching_patterns_count)
                     } else {
                         None
                     }
@@ -87,8 +93,8 @@ fn part_2(grid: &[Vec<char>]) -> usize {
 }
 
 fn main() {
-    let contents = fs::read_to_string("input").expect("Failed to read input file");
-    let grid: Vec<Vec<char>> = contents
+    let input_file_contents = fs::read_to_string("input").expect("Failed to read input file");
+    let grid: Vec<Vec<char>> = input_file_contents
         .lines()
         .map(|line| line.trim().chars().collect())
         .collect();
@@ -99,8 +105,8 @@ fn main() {
 #[cfg(test)]
 mod tests {
     use super::*;
-    fn parse_grid(input: &str) -> Vec<Vec<char>> {
-        input
+    fn parse_grid_from_string(input_string: &str) -> Vec<Vec<char>> {
+        input_string
             .trim()
             .lines()
             .map(|line| line.trim().chars().collect())
@@ -108,7 +114,7 @@ mod tests {
     }
     #[test]
     fn test_part_1() {
-        let input = "\
+        let test_input_string = "\
             MMMSXXMASM
             MSAMXMSMSA
             AMXSXMAAMM
@@ -120,12 +126,12 @@ mod tests {
             MAMMMXMMMM
             MXMXAXMASX
         ";
-        let grid = parse_grid(input);
+        let grid = parse_grid_from_string(test_input_string);
         assert_eq!(part_1(&grid), 18);
     }
     #[test]
     fn test_part_2() {
-        let input = "\
+        let test_input_string = "\
             .M.S......
             ..A..MSMS.
             .M.S.MAA..
@@ -137,7 +143,7 @@ mod tests {
             M.M.M.M.M.
             ..........
         ";
-        let grid = parse_grid(input);
+        let grid = parse_grid_from_string(test_input_string);
         assert_eq!(part_2(&grid), 9);
     }
 }
