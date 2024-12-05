@@ -88,7 +88,35 @@ fn part_2(rules: Vec<&str>, updates: Vec<&str>) -> u32 {
             }
         })
         .collect();
-    0
+    let mut fixed_updates = invalid_updates.clone();
+    let mut updates_fixed = false;
+    while !updates_fixed {
+        updates_fixed = true;
+        let updated_invalid_updates: Vec<Vec<u32>> = fixed_updates
+            .iter()
+            .map(|invalid_update| {
+                rules_numbers
+                    .iter()
+                    .fold(invalid_update.clone(), |mut updated, rule| {
+                        let (first, second) = (rule[0], rule[1]);
+                        let first_pos = updated.iter().position(|&page| page == first);
+                        let second_pos = updated.iter().position(|&page| page == second);
+                        if let (Some(f_pos), Some(s_pos)) = (first_pos, second_pos) {
+                            if f_pos > s_pos {
+                                updated.swap(f_pos, s_pos);
+                                updates_fixed = false;
+                            }
+                        }
+                        updated
+                    })
+            })
+            .collect();
+        fixed_updates = updated_invalid_updates;
+    }
+    fixed_updates
+        .iter()
+        .map(|update| update[update.len() / 2])
+        .sum()
 }
 
 fn main() {
