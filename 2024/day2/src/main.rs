@@ -81,8 +81,7 @@ mod tests {
         ";
         let parsed_input = parse_input(input);
         let total_score = analyze(&parsed_input, 1);
-        let expected_score = 2;
-        assert_eq!(total_score, expected_score);
+        assert_eq!(total_score, 2);
     }
     #[test]
     fn test_part_2() {
@@ -96,7 +95,6 @@ mod tests {
         ";
         let parsed_input = parse_input(input);
         let total_score = analyze(&parsed_input, 2);
-        let expected_score = 4;
-        assert_eq!(total_score, expected_score);
+        assert_eq!(total_score, 4);
     }
 }
