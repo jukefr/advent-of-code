@@ -15,12 +15,7 @@ fn part_1(input: &str) -> u32 {
         .collect();
     let mut guard_position = None;
     let mut guard_direction = None;
-    let directions = vec![
-        (-1, 0), // ^
-        (0, 1),  // >
-        (1, 0),  // v
-        (0, -1), // <
-    ];
+    let directions = vec![(-1, 0), (0, 1), (1, 0), (0, -1)];
     for (i, row) in map.iter().enumerate() {
         for (j, &cell) in row.iter().enumerate() {
             if cell == '^' || cell == 'v' || cell == '<' || cell == '>' {
@@ -39,13 +34,11 @@ fn part_1(input: &str) -> u32 {
     let (mut x, mut y) = guard_position.unwrap();
     let mut direction = guard_direction.unwrap();
     map[x][y] = 'X';
-    let mut out_of_bounds = false;
-    while !out_of_bounds {
+    loop {
         let (dx, dy) = directions[direction];
         let new_x = x as isize + dx;
         let new_y = y as isize + dy;
         if new_x < 0 || new_x >= map.len() as isize || new_y < 0 || new_y >= map[0].len() as isize {
-            out_of_bounds = true;
             break;
         }
         let new_x = new_x as usize;
